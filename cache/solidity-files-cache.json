@@ -1,0 +1,40 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "C:\\Users\\Aarif\\Downloads\\project-bolt-sb1-9cssybh7\\project\\contracts\\PatientDataSharing.sol": {
+      "lastModificationDate": 1758264449067,
+      "contentHash": "46125e2d65029044078919de0e8b52e2",
+      "sourceName": "contracts/PatientDataSharing.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "PatientDataSharing"
+      ]
+    }
+  }
+}

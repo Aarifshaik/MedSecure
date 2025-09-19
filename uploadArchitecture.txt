@@ -1,0 +1,34 @@
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Your File     │───▶│   Encryption     │───▶│  Mock IPFS      │
+│   (Original)    │    │   (AES-256)      │    │  (localStorage) │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+                                │
+                                ▼
+                       ┌──────────────────┐    ┌─────────────────┐
+                       │ Encryption Key   │───▶│   Blockchain    │
+                       │ (localStorage)   │    │   (CID only)    │
+                       └──────────────────┘    └─────────────────┘
+
+
+
+
+
+Patient Upload → File Encrypted → Mock IPFS → Blockchain CID
+                     ↓
+               Key in localStorage
+
+Patient Grant Access → Blockchain Permission + Key Copy → Doctor localStorage
+                                                              ↓
+Doctor Download ← File Decrypted ← Mock IPFS ← Shared Key
+
+
+
+
+| **Feature**             | **Doctor**                                            | **Researcher**                             | **Patient**              |
+| ----------------------- | ----------------------------------------------------- | ------------------------------------------ | ------------------------ |
+| **Register Patients**   | ✅ Yes                                                 | ❌ No                                       | ❌ No                     |
+| **View Patient List**   | ✅ Full details (name, address, phone, age, diagnosis) | ✅ Limited details (diagnosis and age only) | ❌ No                     |
+| **Access Patient Data** | ✅ With patient’s permission                           | ✅ With patient’s permission                | ✅ Own data only          |
+| **Download Files**      | ✅ All patient files                                   | ✅ Diagnosis-related files only             | ✅ Own files              |
+| **Upload Files**        | ❌ No                                                  | ❌ No                                       | ✅ Yes (own medical data) |
+| **Grant/Revoke Access** | ❌ No                                                  | ❌ No                                       | ✅ Full control           |
