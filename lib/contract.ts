@@ -51,7 +51,26 @@ export class ContractService {
     phoneNumber: string,
     emergencyContact: string
   ): Promise<ethers.ContractTransactionResponse> {
+    console.log('contractService.registerPatient called with:', { patientAddress, name, age, phoneNumber, emergencyContact });
+    
     const contract = this.getContract();
+    console.log('Contract instance:', contract.target);
+    
+    // Check if we're connected and have a signer
+    const signer = this.getSigner();
+    const signerAddress = await signer.getAddress();
+    console.log('Signer address:', signerAddress);
+    
+    // Check if signer is the doctor
+    try {
+      const doctorAddress = await contract.doctor();
+      console.log('Doctor address from contract:', doctorAddress);
+      console.log('Is signer the doctor?', signerAddress.toLowerCase() === doctorAddress.toLowerCase());
+    } catch (error) {
+      console.error('Error checking doctor address:', error);
+    }
+    
+    console.log('Calling contract.registerPatient...');
     return await contract.registerPatient(patientAddress, name, age, phoneNumber, emergencyContact);
   }
 
@@ -117,9 +136,22 @@ export class ContractService {
   }
 
   async getEvents(eventName: string, fromBlock = 0) {
-    const contract = this.getContract();
-    const filter = contract.filters[eventName]();
-    return await contract.queryFilter(filter, fromBlock);
+    try {
+      const contract = this.getContract();
+      console.log(`Getting events for: ${eventName}`);
+      
+      // Create filter for the specific event
+      const filter = contract.filters[eventName]();
+      console.log('Filter created:', filter);
+      
+      const events = await contract.queryFilter(filter, fromBlock);
+      console.log(`Found ${events.length} ${eventName} events`);
+      
+      return events;
+    } catch (error) {
+      console.error(`Error getting ${eventName} events:`, error);
+      return [];
+    }
   }
 }
 

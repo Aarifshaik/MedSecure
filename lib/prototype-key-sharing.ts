@@ -51,15 +51,27 @@ export class PrototypeKeySharing {
   static getAllPatientKeys(patientAddress: string): any[] {
     const keys: any[] = [];
     
-    // Scan localStorage for encryption keys
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('encryption_key_')) {
-        const keyData = JSON.parse(localStorage.getItem(key) || '{}');
-        keys.push(keyData);
-      }
-    }
+    // Get files owned by this patient from the database
+    const files = JSON.parse(localStorage.getItem('files') || '[]');
+    const patientFiles = files.filter((f: any) => f.patientAddress === patientAddress);
     
+    // Get encryption keys for those files
+    const encryptionKeys = JSON.parse(localStorage.getItem('encryption_keys') || '[]');
+    
+    patientFiles.forEach((file: any) => {
+      const keyForFile = encryptionKeys.find((k: any) => k.fileId === file.id);
+      if (keyForFile) {
+        keys.push({
+          cid: file.cid,
+          key: keyForFile.keyData,
+          iv: keyForFile.iv,
+          description: file.description,
+          uploadDate: file.uploadDate || new Date().toISOString()
+        });
+      }
+    });
+    
+    console.log(`Found ${keys.length} encryption keys for patient ${patientAddress}`);
     return keys;
   }
 

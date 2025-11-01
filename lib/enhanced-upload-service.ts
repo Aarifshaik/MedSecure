@@ -241,9 +241,16 @@ export class EnhancedUploadService {
       return true;
     }
     
-    // Check if access was shared
+    // Check if access was shared via database
     const sharedKey = localDB.getSharedKeyForFile(userAddress, fileRecord.id);
-    return !!sharedKey;
+    if (sharedKey) {
+      return true;
+    }
+    
+    // Check if access was shared via prototype key sharing (localStorage)
+    const prototypeKeyId = `shared_key_${userAddress}_${fileRecord.cid}`;
+    const prototypeKey = localStorage.getItem(prototypeKeyId);
+    return !!prototypeKey;
   }
   
   /**
@@ -255,10 +262,25 @@ export class EnhancedUploadService {
       return localDB.getEncryptionKeyByFile(fileRecord.id);
     }
     
-    // If user has shared access, get shared key
+    // If user has shared access via database, get shared key
     const sharedKey = localDB.getSharedKeyForFile(userAddress, fileRecord.id);
     if (sharedKey) {
       return localDB.getEncryptionKey(sharedKey.originalKeyId);
+    }
+    
+    // If user has shared access via prototype key sharing (localStorage)
+    const prototypeKeyId = `shared_key_${userAddress}_${fileRecord.cid}`;
+    const prototypeKeyData = localStorage.getItem(prototypeKeyId);
+    if (prototypeKeyData) {
+      const keyData = JSON.parse(prototypeKeyData);
+      // Convert to the format expected by the system
+      return {
+        id: prototypeKeyId,
+        keyData: keyData.encryptionKey,
+        iv: keyData.iv,
+        fileId: fileRecord.id,
+        createdBy: keyData.sharedBy
+      };
     }
     
     return null;

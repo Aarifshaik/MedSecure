@@ -38,8 +38,12 @@ export function useContract() {
     phoneNumber: string,
     emergencyContact: string
   ) => {
+    console.log('useContract.registerPatient called with:', { patientAddress, name, age, phoneNumber, emergencyContact });
     return handleContractCall(
-      () => contractService.registerPatient(patientAddress, name, age, phoneNumber, emergencyContact),
+      () => {
+        console.log('Calling contractService.registerPatient...');
+        return contractService.registerPatient(patientAddress, name, age, phoneNumber, emergencyContact);
+      },
       `Patient ${name} registered successfully`
     );
   }, [handleContractCall]);

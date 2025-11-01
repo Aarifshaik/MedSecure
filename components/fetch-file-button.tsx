@@ -5,6 +5,8 @@ import { Download, Lock, Unlock, Loader2 } from 'lucide-react';
 import { enhancedUploadService } from '@/lib/enhanced-upload-service';
 import { useToast } from './ui/toast';
 import { useWallet } from '@/hooks/use-wallet';
+import { importKey, decryptFile } from '@/lib/crypto';
+import { ipfsService } from '@/lib/ipfs';
 
 interface FetchFileButtonProps {
   cid: string;

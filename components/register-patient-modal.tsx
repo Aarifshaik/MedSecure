@@ -27,7 +27,11 @@ export function RegisterPatientModal({ isOpen, onClose, onSuccess }: RegisterPat
   };
 
   const handleRegisterPatient = async () => {
+    console.log('Starting patient registration...');
+    console.log('Form data:', { patientAddress, patientName, patientAge, phoneNumber, emergencyContact });
+
     if (!isValidAddress(patientAddress)) {
+      console.log('Invalid address:', patientAddress);
       addToast({
         type: 'error',
         title: 'Invalid address',
@@ -37,6 +41,7 @@ export function RegisterPatientModal({ isOpen, onClose, onSuccess }: RegisterPat
     }
 
     if (!patientName.trim() || !patientAge || !phoneNumber.trim()) {
+      console.log('Missing required fields');
       addToast({
         type: 'error',
         title: 'Missing information',
@@ -48,6 +53,7 @@ export function RegisterPatientModal({ isOpen, onClose, onSuccess }: RegisterPat
     setIsRegistering(true);
     
     try {
+      console.log('Calling registerPatient function...');
       addToast({
         type: 'info',
         title: 'Registering patient',
@@ -61,11 +67,16 @@ export function RegisterPatientModal({ isOpen, onClose, onSuccess }: RegisterPat
         phoneNumber,
         emergencyContact
       );
+      
+      console.log('Transaction response:', tx);
+      
       if (!tx) {
-        throw new Error('Failed to register patient');
+        throw new Error('Failed to register patient - no transaction returned');
       }
       
-      await waitForTransaction(tx);
+      console.log('Waiting for transaction confirmation...');
+      const receipt = await waitForTransaction(tx);
+      console.log('Transaction confirmed:', receipt);
       
       addToast({
         type: 'success',
@@ -83,10 +94,31 @@ export function RegisterPatientModal({ isOpen, onClose, onSuccess }: RegisterPat
       
     } catch (error: any) {
       console.error('Patient registration failed:', error);
+      console.error('Error details:', {
+        message: error.message,
+        code: error.code,
+        reason: error.reason,
+        data: error.data
+      });
+      
+      let errorMessage = 'Failed to register patient';
+      
+      if (error.message?.includes('Only doctor can perform this action')) {
+        errorMessage = 'Only doctors can register patients. Please ensure you are connected with a doctor account.';
+      } else if (error.message?.includes('Patient already registered')) {
+        errorMessage = 'This patient is already registered in the system.';
+      } else if (error.message?.includes('user rejected')) {
+        errorMessage = 'Transaction was rejected by user.';
+      } else if (error.reason) {
+        errorMessage = error.reason;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       addToast({
         type: 'error',
         title: 'Registration failed',
-        message: error.message || 'Failed to register patient'
+        message: errorMessage
       });
     } finally {
       setIsRegistering(false);
@@ -180,6 +212,33 @@ export function RegisterPatientModal({ isOpen, onClose, onSuccess }: RegisterPat
             <p className="text-sm text-blue-700">
               <strong>Note:</strong> Only doctors can register new patients in the system.
             </p>
+            <button
+              onClick={async () => {
+                try {
+                  const { contractService } = await import('@/lib/contract');
+                  const contract = contractService.getContract();
+                  const doctorAddr = await contract.doctor();
+                  const signer = contractService.getSigner();
+                  const signerAddr = await signer.getAddress();
+                  console.log('Contract test - Doctor:', doctorAddr, 'Signer:', signerAddr);
+                  addToast({
+                    type: 'info',
+                    title: 'Contract Test',
+                    message: `Doctor: ${doctorAddr.slice(0,6)}... Signer: ${signerAddr.slice(0,6)}...`
+                  });
+                } catch (error) {
+                  console.error('Contract test failed:', error);
+                  addToast({
+                    type: 'error',
+                    title: 'Contract Test Failed',
+                    message: error.message
+                  });
+                }
+              }}
+              className="mt-2 text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 px-2 py-1 rounded"
+            >
+              Test Contract Connection
+            </button>
           </div>
         </div>
         

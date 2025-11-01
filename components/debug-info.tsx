@@ -5,6 +5,8 @@ import { useContract } from '@/hooks/use-contract';
 import { useState } from 'react';
 import { PrototypeKeySharing } from '@/lib/prototype-key-sharing';
 import { DatabaseAdmin } from './database-admin';
+import { ContractDiagnostics } from './contract-diagnostics';
+import { SetupChecker } from './setup-checker';
 import { enhancedUploadService } from '@/lib/enhanced-upload-service';
 
 export function DebugInfo() {
@@ -94,6 +96,14 @@ export function DebugInfo() {
             </div>
           </div>
         )}
+      </div>
+
+      <div className="mt-4">
+        <SetupChecker />
+      </div>
+
+      <div className="mt-4">
+        <ContractDiagnostics />
       </div>
 
       {showDatabase && (

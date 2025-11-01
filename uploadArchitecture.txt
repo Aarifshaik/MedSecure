@@ -32,3 +32,34 @@ Doctor Download ← File Decrypted ← Mock IPFS ← Shared Key
 | **Download Files**      | ✅ All patient files                                   | ✅ Diagnosis-related files only             | ✅ Own files              |
 | **Upload Files**        | ❌ No                                                  | ❌ No                                       | ✅ Yes (own medical data) |
 | **Grant/Revoke Access** | ❌ No                                                  | ❌ No                                       | ✅ Full control           |
+
+
+
+Patients Table:
+├── address (PK)
+├── name, age, phone
+├── registeredAt, registeredBy
+
+Files Table:
+├── id (PK)
+├── cid, patientAddress (FK)
+├── dataType, description
+├── fileSize, fileName, mimeType
+├── encryptionKeyId (FK)
+
+Encryption Keys Table:
+├── id (PK)
+├── keyData, iv
+├── fileId (FK), createdBy
+
+Access Grants Table:
+├── id (PK)
+├── patientAddress (FK)
+├── grantedTo, grantedAt
+├── isActive
+
+Shared Keys Table:
+├── id (PK)
+├── originalKeyId (FK)
+├── sharedWith, sharedBy
+├── fileId (FK)
